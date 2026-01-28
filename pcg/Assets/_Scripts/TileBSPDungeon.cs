@@ -31,6 +31,10 @@ public class ModularTileBSPDungeon : MonoBehaviour
     private List<RoomTile> placedTiles = new List<RoomTile>();
     private BSPNode rootNode;
 
+    // My additions
+    public GameObject objectToSpawn;
+    public GameObject player;
+
     // -----------------------------
     // Unity Start
     // -----------------------------
@@ -52,6 +56,40 @@ public class ModularTileBSPDungeon : MonoBehaviour
         ConnectRooms(rootNode);
         InstantiateTiles();
         RemoveInteriorWalls();
+
+        AddRandomObjects();
+        
+    }
+
+    void AddRandomObjects()
+    {
+        int itr = 0;
+        foreach (Transform child in gameObject.transform)
+        {
+            if (itr == 0) // spawn player in a random corridor whatever man
+            {
+                int spawnPoint = Random.Range(0, child.childCount);
+                Debug.Log(child);
+                Debug.Log(child.GetChild(spawnPoint));
+                Debug.Log(child.GetChild(spawnPoint).position);
+                Instantiate(player, new Vector3(-100,100,100), Quaternion.identity);
+            }
+            if (itr != 0) // skip first GameObject since it's all the corridors
+            {
+                int numSpaces = child.childCount;
+                if (numSpaces > 0) // is a room
+                {
+                    int chance = Random.Range(0,2); // magic number for now
+                    if (chance < 1)
+                    {
+                        int spawnPoint = Random.Range(0, numSpaces);
+                        Instantiate(objectToSpawn, child.GetChild(spawnPoint).position + new Vector3(0,0.5f,0), Quaternion.identity);
+                    }
+                }
+            }
+            itr++;
+        }
+        return;
     }
 
     // -----------------------------
